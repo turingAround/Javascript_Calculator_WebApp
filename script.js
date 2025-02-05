@@ -92,7 +92,9 @@ function clearCalculator() {
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.buttons button').forEach(button => {
         button.addEventListener('click', () => {
-            if (button.textContent === '%') {
+            if (button.classList.contains('backspace')) {
+                handleBackspace();
+            } else if (button.textContent === '%') {
                 inputPercentage();
             } else if (button.classList.contains('operator')) {
                 handleOperator(button.textContent);
@@ -250,4 +252,12 @@ function inputPercentage() {
     }
 }
 
-
+//Function to handle backspace
+function handleBackspace() {
+    if (displayValue.length > 1) {
+        displayValue = displayValue.slice(0, -1);
+    } else {
+        displayValue = '0';
+    }
+    updateDisplay();
+}

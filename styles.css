@@ -60,3 +60,12 @@ button:hover {
 .clear:hover {
     background: #ff3333;
 }
+
+.backspace {
+    background: #ff9999;
+    color: white;
+}
+
+.backspace:hover {
+    background: #ff8080;
+}
