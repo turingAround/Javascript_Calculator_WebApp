@@ -88,27 +88,112 @@ function clearCalculator() {
 
 // Event listeners for buttons
 document.addEventListener('DOMContentLoaded', () => {
-    // Add event listeners for number buttons
     document.querySelectorAll('.buttons button').forEach(button => {
         button.addEventListener('click', () => {
             if (button.classList.contains('operator')) {
                 handleOperator(button.textContent);
             } else if (button.classList.contains('equals')) {
-                if (operator && firstNumber !== null) {
-                    const secondNumber = parseFloat(displayValue);
-                    const result = operate(operator, firstNumber, secondNumber);
-                    displayValue = String(result);
-                    firstNumber = null;
-                    operator = null;
-                    waitingForSecondNumber = false;
-                    updateDisplay();
-                }
+                handleOperator('=');
             } else if (button.classList.contains('clear')) {
                 clearCalculator();
             } else {
-                // It's a number or decimal point
                 inputNumber(button.textContent);
             }
         });
     });
 });
+
+
+// Keyboard support
+document.addEventListener('keydown', (event) => {
+    const key = event.key;
+    if (!isNaN(key) || key === '.') {
+        inputNumber(key);
+    } else if (['+', '-', '*', '/'].includes(key)) {
+        handleOperator(key === '*' ? '×' : key === '/' ? '÷' : key);
+    } else if (key === 'Enter') {
+        if (operator && firstNumber !== null) {
+            const secondNumber = parseFloat(displayValue);
+            const result = operate(operator, firstNumber, secondNumber);
+            displayValue = String(result);
+            firstNumber = null;
+            operator = null;
+            waitingForSecondNumber = false;
+            updateDisplay();
+        }
+    } else if (key === 'Escape') {
+        clearCalculator();
+    }
+});
+
+// Multiple Operators
+function handleMultipleOperators(numbers, operators) {
+    // Make copies of arrays to avoid modifying originals
+    let nums = [...numbers];
+    let ops = [...operators];
+    
+    // First pass: handle multiplication and division
+    for (let i = 0; i < ops.length; i++) {
+        if (ops[i] === '×' || ops[i] === '÷') {
+            // Perform operation
+            const result = operate(ops[i], nums[i], nums[i + 1]);
+            
+            // Replace the two numbers with the result
+            nums.splice(i, 2, result);
+            // Remove the operator
+            ops.splice(i, 1);
+            // Move index back one since we removed an operator
+            i--;
+        }
+    }
+    
+    // Second pass: handle addition and subtraction
+    while (ops.length > 0) {
+        const result = operate(ops[0], nums[0], nums[1]);
+        nums.splice(0, 2, result);
+        ops.splice(0, 1);
+    }
+    
+    return nums[0]; // Final result
+}
+
+// Modified handleOperator function to work with multiple operators
+let numbers = [];
+let operators = [];
+
+function handleOperator(nextOperator) {
+    const inputValue = parseFloat(displayValue);
+
+    if (nextOperator === '=') {
+        if (numbers.length === 0) {
+            numbers.push(inputValue);
+        } else {
+            numbers.push(inputValue);
+            const result = handleMultipleOperators(numbers, operators);
+            displayValue = String(result);
+            numbers = [];
+            operators = [];
+        }
+    } else {
+        if (numbers.length === 0) {
+            numbers.push(inputValue);
+        } else {
+            numbers.push(inputValue);
+        }
+        operators.push(nextOperator);
+    }
+    
+    waitingForSecondNumber = true;
+    updateDisplay();
+}
+
+// Modified clear function to reset arrays
+function clearCalculator() {
+    displayValue = '0';
+    numbers = [];
+    operators = [];
+    waitingForSecondNumber = false;
+    updateDisplay();
+}
+
+
