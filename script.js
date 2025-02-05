@@ -31,6 +31,8 @@ function operate(operator, a, b) {
         case '÷':
         case '/':
             return divide(a, b);
+        case '%':
+            return Number(a) / 100;    
         default:
             return "Error: Invalid operator";
     }
@@ -96,6 +98,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 handleOperator('=');
             } else if (button.classList.contains('clear')) {
                 clearCalculator();
+            } else if (button.textContent === '%') {
+                inputPercentage();
+            } else if (button.textContent === '.') {
+                inputDecimal();
             } else {
                 inputNumber(button.textContent);
             }
@@ -227,4 +233,26 @@ function inputDecimal() {
         updateDisplay();
     }
 }
+
+// Function for Percentage
+function inputPercentage() {
+    // Check if display has a valid number
+    if (displayValue === "Error" || displayValue === "") {
+        return;
+    }
+    
+    const inputValue = parseFloat(displayValue);
+    
+    if (!isNaN(inputValue)) {
+        // If there's a stored first number and operator, calculate percentage of that number
+        if (firstNumber !== null && operator) {
+            displayValue = String((firstNumber * (inputValue / 100)));
+        } else {
+            // Otherwise just convert the current number to percentage
+            displayValue = String(inputValue / 100);
+        }
+        updateDisplay();
+    }
+}
+
 
