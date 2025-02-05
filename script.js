@@ -92,22 +92,21 @@ function clearCalculator() {
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.buttons button').forEach(button => {
         button.addEventListener('click', () => {
-            if (button.classList.contains('operator')) {
+            if (button.textContent === '%') {
+                inputPercentage();
+            } else if (button.classList.contains('operator')) {
                 handleOperator(button.textContent);
             } else if (button.classList.contains('equals')) {
                 handleOperator('=');
             } else if (button.classList.contains('clear')) {
                 clearCalculator();
-            } else if (button.textContent === '%') {
-                inputPercentage();
-            } else if (button.textContent === '.') {
-                inputDecimal();
             } else {
                 inputNumber(button.textContent);
             }
         });
     });
 });
+
 
 
 // Keyboard support
@@ -236,19 +235,15 @@ function inputDecimal() {
 
 // Function for Percentage
 function inputPercentage() {
-    // Check if display has a valid number
-    if (displayValue === "Error" || displayValue === "") {
-        return;
-    }
-    
     const inputValue = parseFloat(displayValue);
     
     if (!isNaN(inputValue)) {
-        // If there's a stored first number and operator, calculate percentage of that number
         if (firstNumber !== null && operator) {
-            displayValue = String((firstNumber * (inputValue / 100)));
+            // If we're in the middle of an operation, calculate percentage of the first number
+            const result = operate('%', firstNumber, inputValue);
+            displayValue = String(result);
         } else {
-            // Otherwise just convert the current number to percentage
+            // Just convert the current number to a percentage
             displayValue = String(inputValue / 100);
         }
         updateDisplay();
