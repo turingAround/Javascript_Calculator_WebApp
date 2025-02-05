@@ -196,4 +196,35 @@ function clearCalculator() {
     updateDisplay();
 }
 
+// Decimal support
+// Function to input numbers
+function inputNumber(number) {
+    // Check for multiple decimals
+    if (number === '.' && displayValue.includes('.')) {
+        displayValue = "Error: Multiple decimals";
+        updateDisplay();
+        setTimeout(() => {
+            displayValue = '0';
+            updateDisplay();
+        }, 1000);
+        return;
+    }
+
+    if (waitingForSecondNumber) {
+        displayValue = number;
+        waitingForSecondNumber = false;
+    } else {
+        // If display is '0', replace it, otherwise append
+        displayValue = displayValue === '0' ? number : displayValue + number;
+    }
+    updateDisplay();
+}
+
+// Add a dedicated decimal function for better control
+function inputDecimal() {
+    if (!displayValue.includes('.')) {
+        displayValue += '.';
+        updateDisplay();
+    }
+}
 
